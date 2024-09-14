@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Note;
 use App\Services\NoteService;
 use Illuminate\Http\Request;
 
@@ -72,6 +73,58 @@ class noteController extends Controller
 
         return response()->json([
             'message' => $response['message'],
+            'status' => $response['status']
+        ], $response['status']);
+    }
+
+    // Nuevo método para archivar notas
+    public function archive($id)
+    {
+        $note = Note::find($id);
+
+        if (!$note) {
+            return response()->json([
+                'message' => 'Nota no encontrada',
+                'status' => 404
+            ], 404);
+        }
+
+        $note->is_archived = true;
+        $note->save();
+
+        return response()->json([
+            'message' => 'Nota archivada exitosamente',
+            'note' => $note,
+            'status' => 200
+        ], 200);
+    }
+
+
+    // NoteController.php
+    public function getArchivedNotes()
+    {
+        $archivedNotes = Note::where('is_archived', true)->get();
+
+        if ($archivedNotes->isEmpty()) {
+            return response()->json([
+                'message' => 'No se encontraron notas archivadas',
+                'status' => 404
+            ], 404);
+        }
+
+        return response()->json([
+            'notes' => $archivedNotes
+        ], 200);
+    }
+
+    // app/Http/Controllers/NoteController.php
+    public function unarchive($id)
+    {
+        $response = $this->noteService->unarchiveNote($id);
+
+        return response()->json([
+            'message' => $response['message'],
+            'note' => $response['note'] ?? null,
             'status' => $response['status']
         ], $response['status']);
     }

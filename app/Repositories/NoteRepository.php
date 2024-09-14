@@ -8,7 +8,7 @@ class NoteRepository
 {
     public function all()
     {
-        return Note::all();
+        return Note::where('is_archived', false)->get(); // Filtra las notas archivadas
     }
 
     public function find($id)
@@ -30,5 +30,32 @@ class NoteRepository
     public function delete(Note $note)
     {
         return $note->delete();
+    }
+
+    public function archive($id)
+    {
+        $note = $this->find($id);
+
+        if ($note) {
+            $note->is_archived = true;
+            $note->save();
+            return $note;
+        }
+
+        return null;
+    }
+
+    // app/Repositories/NoteRepository.php
+    public function unarchive($id)
+    {
+        $note = Note::find($id);
+
+        if ($note) {
+            $note->is_archived = false;
+            $note->save();
+            return $note;
+        }
+
+        return null;
     }
 }

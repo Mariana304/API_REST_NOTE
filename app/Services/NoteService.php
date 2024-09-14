@@ -76,7 +76,6 @@ class NoteService
         ];
     }
 
-
     public function deleteNote($id)
     {
         $note = $this->noteRepository->find($id);
@@ -92,6 +91,53 @@ class NoteService
 
         return [
             'message' => 'Nota eliminada',
+            'status' => 200
+        ];
+    }
+
+    // Nuevo método para archivar la nota
+    public function archiveNote($id)
+    {
+        $note = $this->noteRepository->find($id);
+
+        if (!$note) {
+            return [
+                'message' => 'Nota no encontrada',
+                'status' => 404
+            ];
+        }
+
+        $archivedNote = $this->noteRepository->archive($id);
+
+        if (!$archivedNote) {
+            return [
+                'message' => 'Error al archivar la nota',
+                'status' => 500
+            ];
+        }
+
+        return [
+            'message' => 'Nota archivada exitosamente',
+            'note' => $archivedNote,
+            'status' => 200
+        ];
+    }
+
+    // app/Services/NoteService.php
+    public function unarchiveNote($id)
+    {
+        $note = $this->noteRepository->unarchive($id);
+
+        if (!$note) {
+            return [
+                'message' => 'Nota no encontrada',
+                'status' => 404
+            ];
+        }
+
+        return [
+            'message' => 'Nota desarchivada exitosamente',
+            'note' => $note,
             'status' => 200
         ];
     }
